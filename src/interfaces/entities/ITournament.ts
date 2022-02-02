@@ -11,3 +11,7 @@ export interface ITournament {
   readonly participants: ITournamentParticipants;
   readonly startDate: string;
 }
+
+export interface ICreateTournament {
+  readonly name: string;
+}

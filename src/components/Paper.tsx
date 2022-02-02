@@ -6,4 +6,6 @@ export const Paper = styled.div`
   padding: ${theme.spacing(3)};
   border-radius: ${theme.borderRadius};
   height: calc(100% - ${theme.spacing(6)});
+  display: flex;
+  flex-direction: column;
 `;

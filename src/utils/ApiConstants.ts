@@ -11,5 +11,9 @@ export const ApiConstants = {
       url.search = searchParams.toString();
     }
     return url;
+  },
+
+  getTournament(tournamentId: string): URL {
+    return relativeUrl(`/tournaments/${tournamentId}`);
   }
 };
