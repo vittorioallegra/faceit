@@ -1,10 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { DateTime } from 'luxon';
+import { useDebouncedCallback } from 'use-debounce';
 import { Button, Container, FlexContainer, FlexItem, H4, H6, Input, Paper } from '../../components';
 import { IApplicationStore, ITournament } from '../../interfaces';
 import { tournamentActions } from '../../store';
 import theme from '../../theme';
+import './home.css';
 
 interface IActionProps {
   getTournaments: typeof tournamentActions.loadTournamentsRequested;
@@ -21,33 +23,44 @@ type IProps = IActionProps & IStoreProps;
 const Home: React.FC<IProps> = props => {
   const [search, setSearch] = React.useState('');
 
+  const loadTournaments = () => {
+    props.getTournaments(search !== '' ? search : undefined);
+  };
+  const debouncedLoad = useDebouncedCallback(loadTournaments, 300);
+
   React.useEffect(() => {
-    props.getTournaments();
+    loadTournaments();
   }, []);
 
-  const reloadTournaments = () => {
-    props.getTournaments(search !== '' ? search : undefined);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setSearch(value);
+    debouncedLoad();
   };
 
   return (
     <Container>
       <H4>FACEIT Tournaments</H4>
       <div style={{ marginBottom: theme.spacing(4) }}>
-        <Input placeholder="Search tournament ..." value={search} onChange={e => setSearch(e.target.value)} />
+        <Input placeholder="Search tournament ..." value={search} onChange={handleInputChange} />
       </div>
       {props.isLoading ? (
-        <div style={{ textAlign: 'center' }}>
+        <div className="text-center">
           <p>Loading tournaments ...</p>
         </div>
       ) : props.hasError ? (
-        <div style={{ textAlign: 'center' }}>
+        <div className="text-center">
           <p>Something went wrong.</p>
-          <Button onClick={reloadTournaments}>RETRY</Button>
+          <Button onClick={loadTournaments}>RETRY</Button>
+        </div>
+      ) : props.tournaments.length === 0 ? (
+        <div className="text-center">
+          <p>No tournaments found.</p>
         </div>
       ) : (
         <FlexContainer>
           {props.tournaments.map(it => (
-            <FlexItem>
+            <FlexItem key={it.id}>
               <Paper>
                 <H6>{it.name}</H6>
                 <div>Organizer: {it.organizer}</div>
