@@ -1,23 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import GlobalStyle from './GlobalStyle';
-import store from './store';
-import Container from './components/Container';
-import H4 from './components/H4';
+import { CombinedState } from 'redux';
+import { RestApi } from './api';
+import { configureStore } from './store/configureStore';
+import { IApplicationStore } from './interfaces';
+import App from './containers/App';
 
-const App: React.FC = () => {
-  return (
-    <Container>
-      <H4>FACEIT Tournaments</H4>
-    </Container>
-  );
-};
+const store = configureStore({} as CombinedState<IApplicationStore>, {
+  restApi: new RestApi()
+});
 
 ReactDOM.render(
-  <Provider store={store}>
-    <GlobalStyle />
-    <App />
-  </Provider>,
+  <React.StrictMode>
+    <App store={store} />
+  </React.StrictMode>,
   document.getElementById('root')
 );
