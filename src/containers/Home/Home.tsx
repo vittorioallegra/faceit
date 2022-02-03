@@ -7,6 +7,7 @@ import { IApplicationStore, ITournament } from '../../interfaces';
 import { tournamentActions } from '../../store';
 import theme from '../../theme';
 import './home.css';
+import { useTranslation } from 'react-i18next';
 
 interface IActionProps {
   getTournaments: typeof tournamentActions.loadTournamentsRequested;
@@ -24,6 +25,7 @@ interface IStoreProps {
 type IProps = IActionProps & IStoreProps;
 
 const Home: React.FC<IProps> = props => {
+  const { t } = useTranslation();
   const [search, setSearch] = React.useState('');
   const [actionRequested, setActionRequested] = React.useState(false);
 
@@ -50,7 +52,7 @@ const Home: React.FC<IProps> = props => {
   };
 
   const handleCreateTournament = () => {
-    const name = window.prompt('Tournament Name:');
+    const name = window.prompt(t('pages.home.labels.create'));
     if (name) {
       setActionRequested(true);
       props.createTournament({
@@ -60,7 +62,7 @@ const Home: React.FC<IProps> = props => {
   };
 
   const handleEditTournament = (tournament: ITournament) => () => {
-    const name = window.prompt('New Tournament Name:', tournament.name);
+    const name = window.prompt(t('pages.home.labels.edit'), tournament.name);
     if (name) {
       setActionRequested(true);
       props.editTournament({
@@ -71,7 +73,7 @@ const Home: React.FC<IProps> = props => {
   };
 
   const handleDeleteTournament = (tournament: ITournament) => () => {
-    const result = window.confirm('Do you really want to delete this tournament?');
+    const result = window.confirm(t('pages.home.labels.delete', { name: tournament.name }));
     if (result) {
       setActionRequested(true);
       props.deleteTournament(tournament);
@@ -80,24 +82,24 @@ const Home: React.FC<IProps> = props => {
 
   return (
     <Container>
-      <H4>FACEIT Tournaments</H4>
+      <H4>{t('pages.home.title')}</H4>
       <div style={{ display: 'flex', marginBottom: theme.spacing(4) }}>
-        <Input placeholder="Search tournament ..." value={search} onChange={handleInputChange} />
+        <Input placeholder={t('pages.home.labels.search')} value={search} onChange={handleInputChange} />
         <div className="grow" />
-        <Button onClick={handleCreateTournament}>CREATE TOURNAMENT</Button>
+        <Button onClick={handleCreateTournament}>{t('pages.home.buttons.create')}</Button>
       </div>
       {props.isLoading ? (
         <div className="text-center">
-          <p>Loading tournaments ...</p>
+          <p>{t('pages.home.loading')}</p>
         </div>
       ) : props.hasError ? (
         <div className="text-center">
-          <p>Something went wrong.</p>
-          <Button onClick={loadTournaments}>RETRY</Button>
+          <p>{t('pages.home.error')}</p>
+          <Button onClick={loadTournaments}>{t('pages.home.buttons.retry')}</Button>
         </div>
       ) : props.tournaments.length === 0 ? (
         <div className="text-center">
-          <p>No tournaments found.</p>
+          <p>{t('pages.home.noResults')}</p>
         </div>
       ) : (
         <FlexContainer>
@@ -106,20 +108,25 @@ const Home: React.FC<IProps> = props => {
               <Paper>
                 <H6>{it.name}</H6>
                 <div className="grow">
-                  <div>Organizer: {it.organizer}</div>
-                  <div>Game: {it.game}</div>
                   <div>
-                    Participants: {it.participants.current}/{it.participants.max}
+                    {t('pages.home.fields.organizer')}: {it.organizer}
                   </div>
                   <div>
-                    Start: {DateTime.fromISO(it.startDate).toFormat('dd/LL/yyyy, HH:mm:ss', { locale: 'en-GB' })}
+                    {t('pages.home.fields.game')}: {it.game}
+                  </div>
+                  <div>
+                    {t('pages.home.fields.participants')}: {it.participants.current}/{it.participants.max}
+                  </div>
+                  <div>
+                    {t('pages.home.fields.startDate')}:{' '}
+                    {DateTime.fromISO(it.startDate).toFormat('dd/LL/yyyy, HH:mm:ss', { locale: 'en-GB' })}
                   </div>
                 </div>
                 <div style={{ marginTop: theme.spacing(2) }}>
                   <Button style={{ marginRight: theme.spacing(2) }} onClick={handleEditTournament(it)}>
-                    EDIT
+                    {t('pages.home.buttons.edit')}
                   </Button>
-                  <Button onClick={handleDeleteTournament(it)}>DELETE</Button>
+                  <Button onClick={handleDeleteTournament(it)}>{t('pages.home.buttons.delete')}</Button>
                 </div>
               </Paper>
             </FlexItem>

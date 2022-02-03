@@ -1,0 +1,30 @@
+{
+  "app": {
+    "pages": {
+      "home": {
+        "title": "FACEIT Tournaments",
+        "loading": "Loading tournaments ...",
+        "error": "Something went wrong.",
+        "noResults": "No tournaments found.",
+        "fields": {
+          "organizer": "Organizer",
+          "game": "Game",
+          "participants": "Participants",
+          "startDate": "Start"
+        },
+        "labels": {
+          "search": "Search tournament ...",
+          "create": "Tournament Name:",
+          "edit": "New Tournament Name:",
+          "delete": "Do you really want to delete this tournament '{{ name }}'?"
+        },
+        "buttons": {
+          "create": "CREATE TOURNAMENT",
+          "retry": "RETRY",
+          "edit": "EDIT",
+          "delete": "DELETE"
+        }
+      }
+    }
+  }
+}
