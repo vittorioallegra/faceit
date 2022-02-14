@@ -45,9 +45,9 @@ function* deleteTournament(api: IRestApi, action: ActionType<typeof actions.dele
   try {
     yield call([api, api.deleteTournament], tournament);
 
-    yield put(actions.editTournamentSucceeded());
+    yield put(actions.deleteTournamentSucceeded());
   } catch (e) {
-    yield put(actions.editTournamentFailed(e));
+    yield put(actions.deleteTournamentFailed(e));
   }
 }
 
