@@ -1,13 +1,23 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { DateTime } from 'luxon';
 import { useDebouncedCallback } from 'use-debounce';
-import { Button, Container, FlexContainer, FlexItem, H4, H6, Input, Paper } from '../../components';
+import {
+  Button,
+  Container,
+  FlexContainer,
+  FlexGrow,
+  FlexItem,
+  H4,
+  H6,
+  Input,
+  Paper,
+  TextCenter
+} from '../../components';
 import { IApplicationStore, ITournament } from '../../interfaces';
 import { tournamentActions } from '../../store';
-import theme from '../../theme';
-import './home.css';
-import { useTranslation } from 'react-i18next';
+import { Buttons, Header } from './Fragments';
 
 interface IActionProps {
   getTournaments: typeof tournamentActions.loadTournamentsRequested;
@@ -83,31 +93,31 @@ const Home: React.FC<IProps> = props => {
   return (
     <Container>
       <H4>{t('pages.home.title')}</H4>
-      <div style={{ display: 'flex', marginBottom: theme.spacing(4) }}>
+      <Header>
         <Input placeholder={t('pages.home.labels.search')} value={search} onChange={handleInputChange} />
-        <div className="grow" />
+        <FlexGrow />
         <Button onClick={handleCreateTournament}>{t('pages.home.buttons.create')}</Button>
-      </div>
+      </Header>
       {props.isLoading ? (
-        <div className="text-center">
+        <TextCenter>
           <p>{t('pages.home.loading')}</p>
-        </div>
+        </TextCenter>
       ) : props.hasError ? (
-        <div className="text-center">
+        <TextCenter>
           <p>{t('pages.home.error')}</p>
           <Button onClick={loadTournaments}>{t('pages.home.buttons.retry')}</Button>
-        </div>
+        </TextCenter>
       ) : props.tournaments.length === 0 ? (
-        <div className="text-center">
+        <TextCenter>
           <p>{t('pages.home.noResults')}</p>
-        </div>
+        </TextCenter>
       ) : (
         <FlexContainer>
           {props.tournaments.map(it => (
             <FlexItem key={it.id}>
               <Paper>
                 <H6>{it.name}</H6>
-                <div className="grow">
+                <FlexGrow>
                   <div>
                     {t('pages.home.fields.organizer')}: {it.organizer}
                   </div>
@@ -121,13 +131,11 @@ const Home: React.FC<IProps> = props => {
                     {t('pages.home.fields.startDate')}:{' '}
                     {DateTime.fromISO(it.startDate).toFormat('dd/LL/yyyy, HH:mm:ss', { locale: 'en-GB' })}
                   </div>
-                </div>
-                <div style={{ marginTop: theme.spacing(2) }}>
-                  <Button style={{ marginRight: theme.spacing(2) }} onClick={handleEditTournament(it)}>
-                    {t('pages.home.buttons.edit')}
-                  </Button>
+                </FlexGrow>
+                <Buttons>
+                  <Button onClick={handleEditTournament(it)}>{t('pages.home.buttons.edit')}</Button>
                   <Button onClick={handleDeleteTournament(it)}>{t('pages.home.buttons.delete')}</Button>
-                </div>
+                </Buttons>
               </Paper>
             </FlexItem>
           ))}
