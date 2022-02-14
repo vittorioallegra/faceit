@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { DateTime } from 'luxon';
 import { useDebouncedCallback } from 'use-debounce';
@@ -19,28 +19,17 @@ import { IApplicationStore, ITournament } from '../../interfaces';
 import { tournamentActions } from '../../store';
 import { Buttons, Header } from './Fragments';
 
-interface IActionProps {
-  getTournaments: typeof tournamentActions.loadTournamentsRequested;
-  createTournament: typeof tournamentActions.createTournamentRequested;
-  editTournament: typeof tournamentActions.editTournamentRequested;
-  deleteTournament: typeof tournamentActions.deleteTournamentRequested;
-}
-
-interface IStoreProps {
-  tournaments: ITournament[];
-  isLoading: boolean;
-  hasError: boolean;
-}
-
-type IProps = IActionProps & IStoreProps;
-
-const Home: React.FC<IProps> = props => {
+export const Home: React.FC = () => {
   const { t } = useTranslation();
   const [search, setSearch] = React.useState('');
   const [actionRequested, setActionRequested] = React.useState(false);
+  const dispatch = useDispatch();
+  const tournaments = useSelector((state: IApplicationStore) => state.tournament.tournaments);
+  const isLoading = useSelector((state: IApplicationStore) => state.tournament.isLoading);
+  const hasError = useSelector((state: IApplicationStore) => state.tournament.hasError);
 
   const loadTournaments = () => {
-    props.getTournaments(search !== '' ? search : undefined);
+    dispatch(tournamentActions.loadTournamentsRequested(search !== '' ? search : undefined));
   };
   const debouncedLoad = useDebouncedCallback(loadTournaments, 300);
 
@@ -49,11 +38,11 @@ const Home: React.FC<IProps> = props => {
   }, []);
 
   React.useEffect(() => {
-    if (actionRequested && !props.isLoading && !props.hasError) {
+    if (actionRequested && !isLoading && !hasError) {
       setActionRequested(false);
       loadTournaments();
     }
-  }, [props.isLoading]);
+  }, [isLoading]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -65,9 +54,11 @@ const Home: React.FC<IProps> = props => {
     const name = window.prompt(t('pages.home.labels.create'));
     if (name) {
       setActionRequested(true);
-      props.createTournament({
-        name
-      });
+      dispatch(
+        tournamentActions.createTournamentRequested({
+          name
+        })
+      );
     }
   };
 
@@ -75,10 +66,12 @@ const Home: React.FC<IProps> = props => {
     const name = window.prompt(t('pages.home.labels.edit'), tournament.name);
     if (name) {
       setActionRequested(true);
-      props.editTournament({
-        ...tournament,
-        name
-      });
+      dispatch(
+        tournamentActions.editTournamentRequested({
+          ...tournament,
+          name
+        })
+      );
     }
   };
 
@@ -86,7 +79,7 @@ const Home: React.FC<IProps> = props => {
     const result = window.confirm(t('pages.home.labels.delete', { name: tournament.name }));
     if (result) {
       setActionRequested(true);
-      props.deleteTournament(tournament);
+      dispatch(tournamentActions.deleteTournamentRequested(tournament));
     }
   };
 
@@ -98,22 +91,22 @@ const Home: React.FC<IProps> = props => {
         <FlexGrow />
         <Button onClick={handleCreateTournament}>{t('pages.home.buttons.create')}</Button>
       </Header>
-      {props.isLoading ? (
+      {isLoading ? (
         <TextCenter>
           <p>{t('pages.home.loading')}</p>
         </TextCenter>
-      ) : props.hasError ? (
+      ) : hasError ? (
         <TextCenter>
           <p>{t('pages.home.error')}</p>
           <Button onClick={loadTournaments}>{t('pages.home.buttons.retry')}</Button>
         </TextCenter>
-      ) : props.tournaments.length === 0 ? (
+      ) : tournaments.length === 0 ? (
         <TextCenter>
           <p>{t('pages.home.noResults')}</p>
         </TextCenter>
       ) : (
         <FlexContainer>
-          {props.tournaments.map(it => (
+          {tournaments.map(it => (
             <FlexItem key={it.id}>
               <Paper>
                 <H6>{it.name}</H6>
@@ -144,18 +137,3 @@ const Home: React.FC<IProps> = props => {
     </Container>
   );
 };
-
-const actions: IActionProps = {
-  getTournaments: tournamentActions.loadTournamentsRequested,
-  createTournament: tournamentActions.createTournamentRequested,
-  editTournament: tournamentActions.editTournamentRequested,
-  deleteTournament: tournamentActions.deleteTournamentRequested
-};
-
-const mapStateToProps = (state: IApplicationStore): IStoreProps => ({
-  tournaments: state.tournament.tournaments,
-  isLoading: state.tournament.isLoading,
-  hasError: state.tournament.hasError
-});
-
-export default connect(mapStateToProps, actions)(Home);

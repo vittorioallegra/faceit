@@ -5,7 +5,7 @@ import { i18n } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import GlobalStyle from '../GlobalStyle';
 import { IApplicationStore } from '../interfaces';
-import Home from './Home/Home';
+import { Home } from './Home/Home';
 
 interface IProps {
   i18n: i18n;
