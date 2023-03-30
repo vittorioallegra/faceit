@@ -1,20 +1,9 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { CombinedState } from 'redux';
-import { RestApi } from './api';
-import { configureStore } from './store/configureStore';
-import { IApplicationStore } from './interfaces';
-import App from './containers/App';
-import { Localization } from './config';
+import { App } from './App';
+import { createRoot } from 'react-dom/client';
 
-const i18n = Localization.init('app');
-const store = configureStore({} as CombinedState<IApplicationStore>, {
-  restApi: new RestApi()
-});
-
-ReactDOM.render(
-  <React.StrictMode>
-    <App i18n={i18n} store={store} />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const container = document.getElementById('root');
+if (!container) {
+  throw new Error('No container found');
+}
+const root = createRoot(container);
+root.render(<App />);

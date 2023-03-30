@@ -1,8 +1,3 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next';
-import { DateTime } from 'luxon';
-import { useDebouncedCallback } from 'use-debounce';
 import {
   Button,
   Container,
@@ -13,36 +8,44 @@ import {
   H6,
   Input,
   Paper,
-  TextCenter
+  TextCenter,
 } from '../../components';
-import { IApplicationStore, ITournament } from '../../interfaces';
-import { tournamentActions } from '../../store';
-import { Buttons, Header } from './Fragments';
+import { FetchStatus } from '../../enums';
+import { ITournament } from '../../interfaces';
+import {
+  useCreateTournament,
+  useDeleteTournament,
+  useEditTournament,
+  useFetchTournaments,
+  useTournaments,
+} from '../../store/tournaments/hooks';
+import { Buttons, Header } from './components';
+import { DateTime } from 'luxon';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDebouncedCallback } from 'use-debounce';
 
-export const Home: React.FC = () => {
+export const Home = () => {
   const { t } = useTranslation();
-  const [search, setSearch] = React.useState('');
-  const [actionRequested, setActionRequested] = React.useState(false);
-  const dispatch = useDispatch();
-  const tournaments = useSelector((state: IApplicationStore) => state.tournament.tournaments);
-  const isLoading = useSelector((state: IApplicationStore) => state.tournament.isLoading);
-  const hasError = useSelector((state: IApplicationStore) => state.tournament.hasError);
+  const [search, setSearch] = useState('');
+  const { tournaments, status } = useTournaments();
+  const fetchTournaments = useFetchTournaments();
+  const createTournament = useCreateTournament();
+  const editTournament = useEditTournament();
+  const deleteTournament = useDeleteTournament();
 
   const loadTournaments = () => {
-    dispatch(tournamentActions.loadTournamentsRequested(search !== '' ? search : undefined));
+    fetchTournaments(search !== '' ? search : undefined);
   };
   const debouncedLoad = useDebouncedCallback(loadTournaments, 300);
 
-  React.useEffect(() => {
+  useEffect(() => {
     loadTournaments();
   }, []);
 
-  React.useEffect(() => {
-    if (actionRequested && !isLoading && !hasError) {
-      setActionRequested(false);
-      loadTournaments();
-    }
-  }, [isLoading]);
+  const validateName = (name: string) => {
+    return name.trim().length > 0 && /^[\w\d\s]*$/.test(name);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -52,34 +55,25 @@ export const Home: React.FC = () => {
 
   const handleCreateTournament = () => {
     const name = window.prompt(t('pages.home.labels.create'));
-    if (name) {
-      setActionRequested(true);
-      dispatch(
-        tournamentActions.createTournamentRequested({
-          name
-        })
-      );
+    if (name && validateName(name)) {
+      createTournament({ name });
     }
   };
 
   const handleEditTournament = (tournament: ITournament) => () => {
     const name = window.prompt(t('pages.home.labels.edit'), tournament.name);
-    if (name) {
-      setActionRequested(true);
-      dispatch(
-        tournamentActions.editTournamentRequested({
-          ...tournament,
-          name
-        })
-      );
+    if (name && validateName(name)) {
+      editTournament({
+        ...tournament,
+        name,
+      });
     }
   };
 
   const handleDeleteTournament = (tournament: ITournament) => () => {
     const result = window.confirm(t('pages.home.labels.delete', { name: tournament.name }));
     if (result) {
-      setActionRequested(true);
-      dispatch(tournamentActions.deleteTournamentRequested(tournament));
+      deleteTournament(tournament);
     }
   };
 
@@ -91,11 +85,11 @@ export const Home: React.FC = () => {
         <FlexGrow />
         <Button onClick={handleCreateTournament}>{t('pages.home.buttons.create')}</Button>
       </Header>
-      {isLoading ? (
+      {status === FetchStatus.LOADING ? (
         <TextCenter>
           <p>{t('pages.home.loading')}</p>
         </TextCenter>
-      ) : hasError ? (
+      ) : status === FetchStatus.FAILED ? (
         <TextCenter>
           <p>{t('pages.home.error')}</p>
           <Button onClick={loadTournaments}>{t('pages.home.buttons.retry')}</Button>
@@ -106,7 +100,7 @@ export const Home: React.FC = () => {
         </TextCenter>
       ) : (
         <FlexContainer>
-          {tournaments.map(it => (
+          {tournaments.map((it) => (
             <FlexItem key={it.id}>
               <Paper>
                 <H6>{it.name}</H6>
@@ -122,7 +116,9 @@ export const Home: React.FC = () => {
                   </div>
                   <div>
                     {t('pages.home.fields.startDate')}:{' '}
-                    {DateTime.fromISO(it.startDate).toFormat('dd/LL/yyyy, HH:mm:ss', { locale: 'en-GB' })}
+                    {DateTime.fromISO(it.startDate).toFormat('dd/LL/yyyy, HH:mm:ss', {
+                      locale: 'en-GB',
+                    })}
                   </div>
                 </FlexGrow>
                 <Buttons>

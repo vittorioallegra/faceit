@@ -7,7 +7,7 @@ export class RestApi implements IRestApi {
     return Rest.getRequest(ApiConstants.getTournaments(search).toString());
   }
 
-  async createTournament(tournament: ICreateTournament): Promise<void> {
+  async createTournament(tournament: ICreateTournament): Promise<ITournament> {
     return Rest.postRequest(ApiConstants.getTournaments().toString(), tournament);
   }
 

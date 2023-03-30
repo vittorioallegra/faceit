@@ -1,8 +1,8 @@
-import { createGlobalStyle } from 'styled-components';
-import { normalize } from 'polished';
 import theme from './theme';
+import { normalize } from 'polished';
+import { createGlobalStyle } from 'styled-components';
 
-const GlobalStyle = createGlobalStyle`
+const GlobalStyle: any = createGlobalStyle`
   ${normalize};
 
   body {
@@ -11,6 +11,11 @@ const GlobalStyle = createGlobalStyle`
     color: ${theme.palette.text.primary};
     ${theme.typography.body};
   }
+
+  #root {
+    display: flex;
+    justify-content: center;
+  }
 `;
 
-export default GlobalStyle;
+export { GlobalStyle };

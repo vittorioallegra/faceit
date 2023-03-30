@@ -1,5 +1,5 @@
-import { ITournamentStore } from './tournament/ITournamentStore';
+import { ITournamentsState } from '../../store';
 
 export interface IApplicationStore {
-  tournament: ITournamentStore;
+  tournaments: ITournamentsState;
 }
