@@ -11,7 +11,7 @@ function* fetchTournaments(api: IRestApi, action: ActionType<typeof actions.fetc
 
     yield put(actions.fetchTournamentsSucceeded(tournaments));
   } catch (e) {
-    yield put(actions.fetchTournamentsFailed(e));
+    yield put(actions.fetchTournamentsFailed(e as Error));
   }
 }
 
@@ -23,7 +23,7 @@ function* createTournament(api: IRestApi, action: ActionType<typeof actions.crea
 
     yield put(actions.createTournamentSucceeded(tournament));
   } catch (e) {
-    yield put(actions.createTournamentFailed(e));
+    yield put(actions.createTournamentFailed(e as Error));
   }
 }
 
@@ -35,7 +35,7 @@ function* editTournament(api: IRestApi, action: ActionType<typeof actions.editTo
 
     yield put(actions.editTournamentSucceeded(tournament));
   } catch (e) {
-    yield put(actions.editTournamentFailed(e));
+    yield put(actions.editTournamentFailed(e as Error));
   }
 }
 
@@ -47,7 +47,7 @@ function* deleteTournament(api: IRestApi, action: ActionType<typeof actions.dele
 
     yield put(actions.deleteTournamentSucceeded(tournament));
   } catch (e) {
-    yield put(actions.deleteTournamentFailed(e));
+    yield put(actions.deleteTournamentFailed(e as Error));
   }
 }
 
