@@ -63,10 +63,7 @@ export const Home = () => {
   const handleEditTournament = (tournament: ITournament) => () => {
     const name = window.prompt(t('pages.home.labels.edit'), tournament.name);
     if (name && validateName(name)) {
-      editTournament({
-        ...tournament,
-        name,
-      });
+      editTournament(tournament, name);
     }
   };
 

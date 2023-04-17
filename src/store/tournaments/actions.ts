@@ -18,19 +18,20 @@ export const createTournamentSucceeded = createAction(
 )();
 export const createTournamentFailed = createAction('tournaments.create-tournament.failed', (err: Error) => err)();
 
-export const editTournament = createAction('tournaments.edit-tournament', (tournament: ITournament) => tournament)();
-export const editTournamentSucceeded = createAction(
-  'tournaments.edit-tournament.succeeded',
+export const editTournament = createAction('tournaments.edit-tournament', (tournament: ITournament, name: string) => ({
+  tournament,
+  name,
+}))();
+export const editTournamentFailed = createAction(
+  'tournaments.edit-tournament.failed',
   (tournament: ITournament) => tournament
 )();
-export const editTournamentFailed = createAction('tournaments.edit-tournament.failed', (err: Error) => err)();
 
 export const deleteTournament = createAction(
   'tournaments.delete-tournament',
-  (tournament: ITournament) => tournament
+  (tournament: ITournament, index: number) => ({ tournament, index })
 )();
-export const deleteTournamentSucceeded = createAction(
-  'tournaments.delete-tournament.succeeded',
-  (tournament: ITournament) => tournament
+export const deleteTournamentFailed = createAction(
+  'tournaments.delete-tournament.failed',
+  (tournament: ITournament, index: number) => ({ tournament, index })
 )();
-export const deleteTournamentFailed = createAction('tournaments.delete-tournament.failed', (err: Error) => err)();

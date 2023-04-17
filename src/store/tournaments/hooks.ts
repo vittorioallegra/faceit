@@ -21,11 +21,12 @@ export const useCreateTournament = () => {
 export const useEditTournament = () => {
   const dispatch = useDispatch();
 
-  return (tournament: ITournament) => dispatch(editTournament(tournament));
+  return (tournament: ITournament, name: string) => dispatch(editTournament(tournament, name));
 };
 
 export const useDeleteTournament = () => {
   const dispatch = useDispatch();
+  const { tournaments } = useTournaments();
 
-  return (tournament: ITournament) => dispatch(deleteTournament(tournament));
+  return (tournament: ITournament) => dispatch(deleteTournament(tournament, tournaments.indexOf(tournament)));
 };

@@ -13,14 +13,14 @@ export function tournamentsReducer(state: ITournamentsState = initialState, acti
     case getType(actions.fetchTournaments):
       return { ...state, status: FetchStatus.LOADING };
     case getType(actions.editTournament): {
-      const tournament = action.payload;
+      const { tournament, name } = action.payload;
       return {
         ...state,
-        tournaments: state.tournaments.map((it) => (it.id === tournament.id ? tournament : it)),
+        tournaments: state.tournaments.map((it) => (it.id === tournament.id ? { ...it, name } : it)),
       };
     }
     case getType(actions.deleteTournament): {
-      const tournament = action.payload;
+      const { tournament } = action.payload;
       return {
         ...state,
         tournaments: state.tournaments.filter((it) => it.id !== tournament.id),
@@ -32,14 +32,25 @@ export function tournamentsReducer(state: ITournamentsState = initialState, acti
       const tournament = action.payload;
       return { ...state, status: FetchStatus.SUCCEEDED, tournaments: [tournament, ...state.tournaments] };
     }
-    case getType(actions.editTournamentSucceeded):
-    case getType(actions.deleteTournamentSucceeded):
-      return { ...state, status: FetchStatus.SUCCEEDED };
     case getType(actions.fetchTournamentsFailed):
     case getType(actions.createTournamentFailed):
-    case getType(actions.editTournamentFailed):
-    case getType(actions.deleteTournamentFailed):
       return { ...state, status: FetchStatus.FAILED };
+    case getType(actions.editTournamentFailed): {
+      const tournament = action.payload;
+      return {
+        ...state,
+        tournaments: state.tournaments.map((it) => (it.id === tournament.id ? tournament : it)),
+      };
+    }
+    case getType(actions.deleteTournamentFailed): {
+      const { tournament, index } = action.payload;
+      const { tournaments } = state;
+      tournaments.splice(index, 0, tournament);
+      return {
+        ...state,
+        tournaments,
+      };
+    }
     default:
       return state;
   }

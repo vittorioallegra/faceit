@@ -28,26 +28,22 @@ function* createTournament(api: IRestApi, action: ActionType<typeof actions.crea
 }
 
 function* editTournament(api: IRestApi, action: ActionType<typeof actions.editTournament>) {
-  const tournament = action.payload;
+  const { tournament, name } = action.payload;
 
   try {
-    yield call([api, api.editTournament], tournament);
-
-    yield put(actions.editTournamentSucceeded(tournament));
+    yield call([api, api.editTournament], { ...tournament, name });
   } catch (e) {
-    yield put(actions.editTournamentFailed(e as Error));
+    yield put(actions.editTournamentFailed(tournament));
   }
 }
 
 function* deleteTournament(api: IRestApi, action: ActionType<typeof actions.deleteTournament>) {
-  const tournament = action.payload;
+  const { tournament, index } = action.payload;
 
   try {
     yield call([api, api.deleteTournament], tournament);
-
-    yield put(actions.deleteTournamentSucceeded(tournament));
   } catch (e) {
-    yield put(actions.deleteTournamentFailed(e as Error));
+    yield put(actions.deleteTournamentFailed(tournament, index));
   }
 }
 
